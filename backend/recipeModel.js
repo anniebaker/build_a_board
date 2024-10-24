@@ -59,7 +59,7 @@ const createRecipe = (body) => {
 const deleteRecipe = (id) => {
   return new Promise(function (resolve, reject) {
     pool.query(
-      "DELETE FROM merchants WHERE id = $1",
+      "DELETE FROM recipe_list WHERE id = $1",
       [id],
       (error, results) => {
         if (error) {
@@ -90,9 +90,89 @@ const updateRecipe = (id, body) => {
     );
   });
 };
+
+//get all recipes in our database
+const getSelectedRecipes = async () => {
+  try {
+    return await new Promise(function (resolve, reject) {
+      pool.query("SELECT selected.selected_id, recipe_list.id, recipe_list.recipe, recipe_list.method, recipe_list.made, recipe_list.genre, recipe_list.original_url, recipe_list.url, recipe_list.faves, recipe_list.meal_type, recipe_list.last_made, recipe_list.tags FROM selected LEFT JOIN recipe_list ON recipe_list.id = selected.selected_recipe_id ORDER BY recipe_list.recipe", (error, results) => {
+        if (error) {
+          reject(error);
+        }
+        if (results && results.rows) {
+          resolve(results.rows);
+        } else {
+          reject(new Error("No results found"));
+        }
+      });
+    });
+  } catch (error_1) {
+    console.error(error_1);
+    throw new Error("Internal server error");
+  }
+};
+
+const selectRecipe = (body) => {
+  return new Promise(function (resolve, reject) {
+    const {selected_recipe_id} = body;
+    pool.query(
+      "INSERT INTO selected (is_selected, selected_recipe_id) VALUES ('TRUE', $1) RETURNING *",
+      [selected_recipe_id],
+      (error, results) => {
+        if (error) {
+          reject(error);
+        }
+        if (results && results.rows) {
+          resolve(
+            `A new recipe has been selected: ${JSON.stringify(results.rows[0])}`
+          );
+        } else {
+          reject(new Error("No results found"));
+        }
+      }
+    );
+  });
+};
+
+//delete a selection
+const removeSelection = (selected_id) => {
+  return new Promise(function (resolve, reject) {
+    pool.query(
+      "DELETE FROM selected WHERE selected_id = $1",
+      [selected_id],
+      (error, results) => {
+        if (error) {
+          reject(error);
+        }
+        resolve(`Selected deleted with selected_id: ${selected_id}`);
+      }
+    );
+  });
+};
+
+//remove all selected
+const clearAllSelected = (id) => {
+  return new Promise(function (resolve, reject) {
+    pool.query(
+      "TRUNCATE selected",
+      [id],
+      (error, results) => {
+        if (error) {
+          reject(error);
+        }
+        resolve(`Selected cleared`);
+      }
+    );
+  });
+};
+
 module.exports = {
     getRecipes,
     createRecipe,
     deleteRecipe,
-    updateRecipe
+    updateRecipe,
+    getSelectedRecipes,
+    selectRecipe,
+    removeSelection,
+    clearAllSelected
 };

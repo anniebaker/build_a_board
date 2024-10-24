@@ -65,6 +65,50 @@ app.put("/recipes/:id", (req, res) => {
     });
 });
 
+
+
+app.get('/recipes', (req, res) => {
+  recipe_model.getSelectedRecipes()
+  .then(response => {
+    res.status(200).send(response);
+  })
+  .catch(error => {
+    res.status(500).send(error);
+  })
+})
+
+app.post('/selected', (req, res) => {
+  recipe_model.selectRecipe(req.body)
+  .then(response => {
+    res.status(200).send(response);
+  })
+  .catch(error => {
+    res.status(500).send(error);
+  })
+})
+
+app.delete('/selected/:id', (req, res) => {
+  recipe_model.removeSelection(req.params.id)
+  .then(response => {
+    res.status(200).send(response);
+  })
+  .catch(error => {
+    res.status(500).send(error);
+  })
+})
+
+app.delete('/selected', (req, res) => {
+  recipe_model.clearAllSelected(req.params.id)
+  .then(response => {
+    res.status(200).send(response);
+  })
+  .catch(error => {
+    res.status(500).send(error);
+  })
+})
+
+
+
 app.listen(port, () => {
   console.log(`App running on port ${port}.`)
 })
