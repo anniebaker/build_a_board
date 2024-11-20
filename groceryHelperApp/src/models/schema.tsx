@@ -41,9 +41,9 @@ export interface Ingredient {
 	id: string;
 	recipe_id: string;
 	recipe_name: string;
-	staple: boolean;
-	grocery_location: GroceryLocation;
-	optional: boolean;
+	staple?: boolean;
+	grocery_location?: GroceryLocation;
+	optional?: boolean;
 }
 
 export enum GroceryLocation {
@@ -61,4 +61,27 @@ export enum GroceryLocation {
 	DIY = "DIY",
 }
 
+export interface Shop {
+	item: string;
+	ingredient_id?: string;
+	recipe_id?: string;
+	recipe_name?: string;
+	staple?: boolean;
+	grocery_location?: GroceryLocation;
+	optional?: boolean;
+	quantity?: number;
+}
 //export type { Selected as Selected };
+export interface RecipeIngredient {
+	faves: string[];
+	genre: string;
+	id: string;
+	last_made: Date;
+	made: boolean;
+	meal_type: string[];
+	method: string;
+	name: string;
+	recipe: string;
+	recipe_ingredient_name: string;
+	tags: string[];
+}

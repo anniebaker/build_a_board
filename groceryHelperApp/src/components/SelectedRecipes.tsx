@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { fetchSelected, deleteSelectedRecipe } from "../services/apiClient";
 import { Recipe, ApiResponse, Selected } from "../models/schema";
-import { Checkbox } from "@chakra-ui/react";
+import { Checkbox } from "./ui/checkbox";
 
 interface SelectedRecipesProps {
 	notifySelectedRefresh: Function;

@@ -1,4 +1,10 @@
-import { Recipe, ApiResponse, Selected, Ingredient } from "../models/schema";
+import {
+	Recipe,
+	ApiResponse,
+	RecipeIngredient,
+	Selected,
+	Ingredient,
+} from "../models/schema";
 
 const baseURL = "http://localhost:3001";
 
@@ -84,6 +90,20 @@ export async function fetchSelectedRecipeIngredients(): Promise<
 > {
 	try {
 		const response = await fetch(baseURL + "/ingredients/selected");
+		async function test() {
+			console.log("Testing!");
+		}
+		return response.json();
+	} catch (e) {
+		console.log(e);
+	}
+}
+
+export async function fetchRecipeIngredients(): Promise<
+	RecipeIngredient[] | undefined
+> {
+	try {
+		const response = await fetch(baseURL + "/ingredients/recipes");
 		async function test() {
 			console.log("Testing!");
 		}
