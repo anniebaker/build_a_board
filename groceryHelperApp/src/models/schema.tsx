@@ -3,7 +3,7 @@ export interface Recipe {
 	recipe?: string;
 	method?: string[];
 	made?: boolean;
-	genre?: string;
+	genre?: string[];
 	original_url?: string;
 	url?: string;
 	faves?: string[];
@@ -70,6 +70,11 @@ export interface Shop {
 	grocery_location?: GroceryLocation;
 	optional?: boolean;
 	quantity?: number;
+}
+
+export interface ShopListState {
+	original: Shop[];
+	display: Shop[];
 }
 //export type { Selected as Selected };
 export interface RecipeIngredient {

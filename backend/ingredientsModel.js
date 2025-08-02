@@ -87,8 +87,14 @@ const createRecipeIngredient = (body) => {
 	return new Promise(function (resolve, reject) {
 		const { name, staple, grocery_location } = body;
 		pool.query(
-			"INSERT INTO recipe_ingredients (recipe_ingredient_name, optional, group, ingredient_id, recipe_id) VALUES ($1, $2, $3, $4, $5) RETURNING * ",
-			[recipe_ingredient_name, optional, group, ingredient_id, recipe_id],
+			"INSERT INTO recipe_ingredients (recipe_ingredient_name, optional, ingredient_group, ingredient_id, recipe_id) VALUES ($1, $2, $3, $4, $5) RETURNING * ",
+			[
+				recipe_ingredient_name,
+				optional,
+				ingredient_group,
+				ingredient_id,
+				recipe_id,
+			],
 			(error, results) => {
 				if (error) {
 					reject(error);

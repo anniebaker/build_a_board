@@ -1,4 +1,15 @@
-import { Stack, Text, Input, Button, IconButton } from "@chakra-ui/react";
+"use client";
+import {
+	Stack,
+	Text,
+	Input,
+	Button,
+	Group,
+	SimpleGrid,
+	IconButton,
+	Box,
+	Flex,
+} from "@chakra-ui/react";
 import React, { useCallback, useEffect, useState } from "react";
 import {
 	fetchRecipes,
@@ -7,7 +18,6 @@ import {
 	fetchSelected,
 	deleteSelectedRecipe,
 	deleteRecipe,
-	fetchSelectedRecipeIngredients,
 	fetchRecipeIngredients,
 } from "../services/apiClient";
 import {
@@ -35,9 +45,10 @@ import {
 	PopoverRoot,
 	PopoverTrigger,
 } from "./ui/popover";
-import { AnyString } from "@chakra-ui/react/dist/types/styled-system/generated/system.gen";
 import { MdFilterList } from "react-icons/md";
-
+import { LuPlus } from "react-icons/lu";
+import { Card, For } from "@chakra-ui/react";
+import { Tag } from "./ui/tag";
 interface ListCollection {
 	items: Array<ItemList>;
 }
@@ -80,38 +91,6 @@ const RecipeView = () => {
 			setDisplayRecipes(filteredRecipes);
 		}
 	}, [value]);
-
-	useEffect(() => {
-		async function handleFetchSelectedIngredients() {
-			const _selectedIngredients = await fetchSelectedRecipeIngredients();
-			const ingredientMap = new Map(
-				_selectedIngredients?.map((i) => [i.id, i])
-			);
-			var _shoppingList: Shop[] = [];
-			for (let [key, val] of ingredientMap) {
-				const dupes = _selectedIngredients?.filter(
-					(originalIng, idx, array) => originalIng.id === key
-				);
-				const numIngredients = dupes?.length === 0 ? 1 : dupes?.length;
-				var shop: Shop = {
-					item: val.name,
-					ingredient_id: val.id,
-					recipe_id: val.recipe_id,
-					recipe_name: val.recipe_name,
-					staple: val.staple,
-					grocery_location: val.grocery_location,
-					optional: val.optional,
-					quantity: numIngredients,
-				};
-				_shoppingList.push(shop);
-			}
-			const nonStaples = _selectedIngredients?.filter(
-				(ingredient) => ingredient.staple == false
-			);
-			setShoppingList(_shoppingList);
-		}
-		handleFetchSelectedIngredients();
-	}, [selectedRecipes]);
 
 	useEffect(() => {
 		async function handleFetchRecipes() {
@@ -170,10 +149,11 @@ const RecipeView = () => {
 	};
 
 	const handleRecipeCheck = (val: any) => {
-		console.log(val);
-		const updatedSelected = selectRecipe(val.target.value).then((res) => {
-			setSelectedRecipes(res);
-		});
+		const updatedSelected = selectRecipe(val.currentTarget?.value).then(
+			(res) => {
+				setSelectedRecipes(res);
+			}
+		);
 	};
 	const handleInput = (e: any) => {
 		setNewRecipe(e.target.value);
@@ -205,8 +185,7 @@ const RecipeView = () => {
 			</Stack>
 
 			<Stack>
-				<ShopTable shoppingList={shoppingList} />
-				<Text>Selected</Text>
+				<Text>Selected for the week</Text>
 				{selectedRecipes?.map((selectedRecipe) => (
 					<Checkbox
 						onChange={handleDeselectRecipe}
@@ -217,71 +196,60 @@ const RecipeView = () => {
 						{selectedRecipe.recipe}
 					</Checkbox>
 				))}
-				<Text>Recipes</Text>
+				<PopoverRoot size="xs">
+					<PopoverTrigger asChild>
+						<IconButton
+							aria-label="Filter by ingredient"
+							variant="ghost"
+							size="sm"
+						>
+							<MdFilterList />
+						</IconButton>
+					</PopoverTrigger>
 
-				<Table.Root size="sm">
-					<Table.Header>
-						<Table.Row>
-							<Table.ColumnHeader>
-								Recipe
-								<PopoverRoot size="xs">
-									<PopoverTrigger asChild>
-										<IconButton
-											aria-label="Filter by ingredient"
-											variant="ghost"
-											size="sm"
-										>
-											<MdFilterList />
-										</IconButton>
-									</PopoverTrigger>
+					<PopoverContent>
+						<PopoverBody>
+							<SelectRoot
+								collection={displayIngredients}
+								value={value}
+								onValueChange={(e: any) => setValue(e.value)}
+							>
+								<SelectTrigger>
+									<SelectValueText placeholder="Ingredient" />
+								</SelectTrigger>
+								<SelectContent>
+									{displayIngredients?.items.map((ing) => (
+										<SelectItem item={ing} key={ing.value}>
+											{ing.label}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</SelectRoot>
+						</PopoverBody>
+					</PopoverContent>
+				</PopoverRoot>
 
-									<PopoverContent>
-										<PopoverBody>
-											<SelectRoot
-												collection={displayIngredients}
-												value={value}
-												onValueChange={(e: any) => setValue(e.value)}
-											>
-												<SelectTrigger>
-													<SelectValueText placeholder="Ingredient" />
-												</SelectTrigger>
-												<SelectContent>
-													{displayIngredients?.items.map((ing) => (
-														<SelectItem item={ing} key={ing.value}>
-															{ing.label}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</SelectRoot>
-										</PopoverBody>
-									</PopoverContent>
-								</PopoverRoot>
-							</Table.ColumnHeader>
-							<Table.ColumnHeader>Genre</Table.ColumnHeader>
-							<Table.ColumnHeader>Faves</Table.ColumnHeader>
-						</Table.Row>
-					</Table.Header>
-					<Table.Body>
-						{recipeList?.map((recipe, idx) => (
-							<Table.Row key={recipe.id + "tr-recipe"}>
-								<Table.Cell>
-									<Button
-										onClick={handleRecipeCheck}
-										aria-label="Add Recipe"
-										key={recipe.id}
-										value={recipe.id}
-										size="xs"
-									>
-										Add
-									</Button>
-									{recipe.recipe}
-								</Table.Cell>
-								<Table.Cell>{recipe.genre}</Table.Cell>
-								<Table.Cell>{recipe.faves}</Table.Cell>
-							</Table.Row>
-						))}
-					</Table.Body>
-				</Table.Root>
+				{recipeList?.map((recipe, idx) => (
+					<Box key={recipe.id + "-box"}>
+						<Flex justify="space-between" key={recipe.id + "-parentflex"}>
+							<Box width="90%" key={recipe.id + "-innerbox"}>
+								<Box key={recipe.id + "-innermostbox"}>{recipe.recipe}</Box>
+								{recipe.genre?.length &&
+									recipe.genre.map((gen) => <Tag>{gen}</Tag>)}
+							</Box>
+							<IconButton
+								onClick={handleRecipeCheck}
+								aria-label="Add Recipe"
+								key={recipe.id}
+								value={recipe.id}
+								size="lg"
+								marginEnd="auto"
+							>
+								<LuPlus />
+							</IconButton>
+						</Flex>
+					</Box>
+				))}
 			</Stack>
 		</>
 	);

@@ -2,6 +2,8 @@
 
 1. Start database (this will likely already be running - port 5432)
    brew services run postgresql
+   (might be: ) brew services run postgresql@14
+
    psql -d chez_mingus_db -U aknee
 
 2. Start express server (port 3001)
@@ -35,9 +37,6 @@ Drag n drop
 2. DONE Create ingredients table
 3. DONE Create recipe_ingredients table
 
-npm uninstall -D @glideapps/glide-data-grid
-npm uninstall -D marked
-
 @chakra-ui/react
 npm uninstall -D @emotion/react
 npm uninstall -D framer-motion
@@ -46,12 +45,18 @@ npm uninstall -D framer-motion
 or
 npm uninstall --save-dev @chakra-ui/react
 npm uninstall -D @emotion/styled framer-motion
+npm uninstall -D @chakra-ui/react
+
 npm i -D @chakra-ui/cli
 npm i @chakra-ui/cli
 
-npx @chakra-ui/cli snippet add
+npx @chakra-ui/cli snippet add checkbox-card
+chakra snippet add checkbox-card
 
 Run from npx:
 npx @chakra-ui/cli snippet add tag
 <component>
 Run from local: npx chakra snippet add <component>
+
+git config --global user.email "bakeranneabb@gmail.com"
+git config --global user.name "anniebaker"
